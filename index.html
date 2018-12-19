@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Mencoba Game Canvas</title>
+    <style>
+        canvas {
+            border: 1px solid #d3d3d3;
+            background-color : #f1f1f1;
+        }
+    </style>
+</head>
+<body onload="startGame()"> <!-- Event onload akan membuka fungsi startGame()-->
+    <script>
+
+        var redGamePiece;
+
+        function startGame() {
+            myGameArea.start(); // start() untuk memanggil metode start()
+            redGamePiece = new component (40, 40, "red" , 10, 110);
+            // blueGamePiece = new component (140, 10, "blue" , 10, 120);
+        }
+
+        var myGameArea = { // membuat canvas
+            canvas : document.createElement("canvas"),
+            start : function() { 
+                this.canvas.width = 480;
+                this.canvas.height = 270;
+                this.context = this.canvas.getContext("2d");
+                document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+                this.interval = setInterval(updateGameArea, 20);
+            },
+            
+            //Untuk Menghilangkan Jejak Objek ketika bergerak
+            clear : function() {
+                this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
+            }
+        }
+
+        function component (width, height, color, x, y) { //membuat pemain/objek
+            this.width =width;
+            this.height = height;
+            this.x = x;
+            this.y = y;
+            this.speedX = 0; //inisialisasi kecepatan
+            this.speedY = 0; //inisialisasi kecepatan
+            this.update = function(){
+            ctx = myGameArea.context;
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            }
+
+            //Untuk Membuat Posisi Baru Objek Merah
+            this.newPos = function () {
+                this.x += this.speedX;
+                this.y += this.speedY;
+            }
+
+        }
+
+        //Untuk Membuat objek berhenti
+        function stopMove() {
+            redGamePiece.speedX = 0;
+            redGamePiece.speedY = 0;
+        }
+
+        //Untuk Membuat Frame
+        function updateGameArea() {
+            myGameArea.clear(); // Memanggil Method Clear Game Area
+            // redGamePiece.x += 1;
+            redGamePiece.update(); // Memanggil Method Update Frame
+            redGamePiece.newPos(); // Memanggil Method Update Posisi
+            // blueGamePiece.update();
+        }
+
+        //Untuk Membuat Controller Perpindahan Ke Atas
+        function moveup(){
+            redGamePiece.speedY -= 1;
+        }
+
+        //Untuk Membuat Controller Perpindahan Ke Bawah
+        function movedown(){
+            redGamePiece.speedY += 1;
+        }
+
+        //Untuk Membuat Controller Perpindahan Ke Kiri
+        function moveleft(){
+            redGamePiece.speedX -= 1;
+        }
+
+        //Untuk Membuat Controller Perpindahan Ke Kanan
+        function moveright(){
+            redGamePiece.speedX += 1;
+        }
+    </script>
+    <!-- Menampilkan Tombol Kontrol-->
+    <br/>
+    <button onmousedown="moveup()" onmouseup="stopMove()" ontouchstart="moveup">ATAS</button><br>
+    <button onmousedown="moveleft()" onmouseup="stopMove()" ontouchstart="moveleft()">KIRI</button>
+    <button onmousedown="moveright()" onmouseup="stopmove()" ontouchstart="moveright()">KANAN</button><br>
+    <button onmousedown="movedown()" onmouseup="stopmove()" ontouchstart="movedown()">BAWAH</button>
+</body>
+</html>
