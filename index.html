@@ -1,83 +1,87 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Mencoba Game Canvas</title>
-    <style>
-        canvas {
-            border: 1px solid #d3d3d3;
-            background-color : #f1f1f1;
-        }
-    </style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+</style>
 </head>
-<body onload="startGame()"> <!-- Event onload akan membuka fungsi startGame()-->
-    <script>
+<body onload="startGame()"> <!-- memanggil method startgame -->
+<script>
 
-        var redGamePiece;
+var kotakObjek; //Pembuatan variabel yg menjadi objek permainan
+var penghalang;
 
-        function startGame() {
-            myGameArea.start(); // start() untuk memanggil metode start()
-            redGamePiece = new component (40, 40, "red" , 10, 110);
-        }
+//method untuk memulai permainan
+function startGame() { 
+    areaPermainan.start(); //memanggil method untuk membuat canvas
+    penghalang = new component(5, 200, "aqua", 300, 120);
+    kotakObjek = new component(30, 30, "red", 10, 120); //inisialisasi pengisian nilai objek
+}
 
-        var myGameArea = { // membuat canvas
-            canvas : document.createElement("canvas"),
-            start : function() { 
-                this.canvas.width = 480;
-                this.canvas.height = 270;
-                this.context = this.canvas.getContext("2d");
-                document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-                this.interval = setInterval(updateGameArea, 20);
-                window.addEventListener('keydown', function (e){
-                    myGameArea.key = e.keyCode;
-                })
-                window.addEventListener('keyup', function(e){
-                    myGameArea.key = false;
-                })
-            },
-            
-            //Untuk Menghilangkan Jejak Objek ketika bergerak
-            clear : function() {
-                this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
-            }
-        }
+//konstruktor yang berisi method area permainan
+var areaPermainan = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = 480;
+        this.canvas.height = 270;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.interval = setInterval(updateGameArea, 20);
+        window.addEventListener('keydown', function (e) {
+            areaPermainan.keys = (areaPermainan.keys || []);
+            areaPermainan.keys[e.keyCode] = (e.type == "keydown");
+        })
+        window.addEventListener('keyup', function (e) {
+            areaPermainan.keys[e.keyCode] = (e.type == "keydown");            
+        })
+    }, 
 
-        function component (width, height, color, x, y) { //membuat pemain/objek
-            this.width =width;
-            this.height = height;
-            this.speedX = 0; //inisialisasi kecepatan
-            this.speedY = 0; //inisialisasi kecepatan
-            this.x = x;
-            this.y = y;
-            this.update = function(){
-                ctx = myGameArea.context;
-                ctx.fillStyle = color;
-                ctx.fillRect(this.x, this.y, this.width, this.height);
-                }
+    //method untuk membuat objek tidak meninggalkan jejak pada canvas
+    clear : function(){
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
 
-            //Untuk Membuat Posisi Baru Objek Merah
-            this.newPos = function () {
-                this.x += this.speedX;
-                this.y += this.speedY;
-            }
+//method membuat objek
+function component(width, height, color, x, y) {
+    this.gamearea = areaPermainan;
+    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.x = x;
+    this.y = y;    
+    this.update = function() {
+        ctx = areaPermainan.context;
+        ctx.fillStyle = color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
 
-        }
+    //method untuk posisi baru objek
+    this.newPos = function() {
+        this.x += this.speedX;
+        this.y += this.speedY;        
+    }    
+}
 
-        //Untuk Membuat Frame
-        function updateGameArea() {
-            myGameArea.clear(); //Memanggil method clear untuk meninggalkan jejak
-            redGamePiece.speedX = 0;
-            redGamePiece.speedY = 0;    
-            if (myGameArea.key && myGameArea.key == 37) {redGamePiece.speedX = -1; }
-            if (myGameArea.key && myGameArea.key == 39) {redGamePiece.speedX = 1; }
-            if (myGameArea.key && myGameArea.key == 38) {redGamePiece.speedY = -1; }
-            if (myGameArea.key && myGameArea.key == 40) {redGamePiece.speedY = 1; }
-            redGamePiece.newPos();    
-            redGamePiece.update();
-        }
-
-    </script>
+//method untuk membuat frame agar terlihat seperti gambar bergerak
+function updateGameArea() {
+    areaPermainan.clear(); 
+    kotakObjek.speedX = 0;
+    kotakObjek.speedY = 0;    
+    if (areaPermainan.keys && areaPermainan.keys[37]) {kotakObjek.speedX = -1; }
+    if (areaPermainan.keys && areaPermainan.keys[39]) {kotakObjek.speedX = 1; }
+    if (areaPermainan.keys && areaPermainan.keys[38]) {kotakObjek.speedY = -1; }
+    if (areaPermainan.keys && areaPermainan.keys[40]) {kotakObjek.speedY = 1; }
+    kotakObjek.newPos();    
+    kotakObjek.update();
+    penghalang.update();
+}
+</script>
+<p>Game Object</p>
 </body>
 </html>
