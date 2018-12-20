@@ -43,7 +43,12 @@ var areaPermainan = {
     //method untuk membuat objek tidak meninggalkan jejak pada canvas
     clear : function(){
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    },
+
+    stop : function() {
+        clearInterval(this.interval);
     }
+
 }
 
 //method membuat objek
@@ -65,23 +70,67 @@ function component(width, height, color, x, y) {
     this.newPos = function() {
         this.x += this.speedX;
         this.y += this.speedY;        
+    }
+
+    //method untuk efek tabrakan dengan objek lain
+    this.crashWith = function (otherobj) {
+        var myleft = this.x;
+        var myright = this.x + (this.width);
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var crash = true;
+        if((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) ||
+        (myleft > otherright)) {
+            crash = false;
+        }
+        return crash;
     }    
 }
 
 //method untuk membuat frame agar terlihat seperti gambar bergerak
 function updateGameArea() {
-    areaPermainan.clear(); 
-    kotakObjek.speedX = 0;
-    kotakObjek.speedY = 0;    
-    if (areaPermainan.keys && areaPermainan.keys[37]) {kotakObjek.speedX = -1; }
-    if (areaPermainan.keys && areaPermainan.keys[39]) {kotakObjek.speedX = 1; }
-    if (areaPermainan.keys && areaPermainan.keys[38]) {kotakObjek.speedY = -1; }
-    if (areaPermainan.keys && areaPermainan.keys[40]) {kotakObjek.speedY = 1; }
-    kotakObjek.newPos();    
-    kotakObjek.update();
-    penghalang.update();
+    if (kotakObjek.crashWith(penghalang)) {
+        areaPermainan.stop();
+    } else {
+        areaPermainan.clear();
+        penghalang.update();
+        kotakObjek.x += kotakObjek.speedX;
+        kotakObjek.y += kotakObjek.speedY;    
+        kotakObjek.update();
+    }
+}
+
+function moveup() {
+    kotakObjek.speedY = -1; 
+}
+
+function movedown() {
+    kotakObjek.speedY = 1; 
+}
+
+function moveleft() {
+    kotakObjek.speedX = -1; 
+}
+
+function moveright() {
+    kotakObjek.speedX = 1; 
+}
+
+function clearmove() {
+    kotakObjek.speedX = 0; 
+    kotakObjek.speedY = 0; 
 }
 </script>
-<p>Game Object</p>
+<div style="text-align:center;width:480px;">
+  <button onmousedown="moveup()" onmouseup="clearmove()" ontouchstart="moveup()">UP</button><br><br>
+  <button onmousedown="moveleft()" onmouseup="clearmove()" ontouchstart="moveleft()">LEFT</button>
+  <button onmousedown="moveright()" onmouseup="clearmove()" ontouchstart="moveright()">RIGHT</button><br><br>
+  <button onmousedown="movedown()" onmouseup="clearmove()" ontouchstart="movedown()">DOWN</button>
+</div>
+<p>Try hitting the obstacle, and the game will stop.</p>
 </body>
 </html>
